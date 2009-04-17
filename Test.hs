@@ -1,7 +1,8 @@
 import Control.Concurrent hiding (readChan, writeChan)
-import Control.Concurrent.BoundedChan
-import Control.Monad
+import Control.Concurrent.BoundedChan (BoundedChan, 
+                                       newBoundedChan, readChan, writeChan)
 
+main :: IO ()
 main = do
   bc <- newBoundedChan 1
   forkIO $ runWriter bc 0
