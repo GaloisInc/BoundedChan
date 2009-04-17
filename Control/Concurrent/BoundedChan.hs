@@ -32,7 +32,7 @@ data BoundedChan a = BC {
      }
 -- LOCK ORDERING: A -> B -> C
 
--- |Create a new bounded chan with size n. 
+-- |Create a new bounded chan with size n.
 newBoundedChan :: Int -> IO (BoundedChan a)
 newBoundedChan x = do
   entls   <- replicateM x newEmptyMVar
@@ -50,7 +50,7 @@ writeChan (BC size contents wposMV _) x = do
   putMVar wposMV $! (wpos + 1) `mod` size
   putMVar (contents ! wpos) x
 
--- |Read an element from the channel. If the channel is empty, this routine 
+-- |Read an element from the channel. If the channel is empty, this routine
 -- will block until it is able to read.
 readChan :: BoundedChan a -> IO a
 readChan (BC size contents _ rposMV) = do

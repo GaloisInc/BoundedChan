@@ -12,7 +12,7 @@ main = do
 
 runWriter :: BoundedChan Int -> Int -> IO ()
 runWriter bc x = do
-  writeChan bc x 
+  writeChan bc x
   runWriter bc (x + 1)
 
 runReader :: BoundedChan Int -> IO ()
