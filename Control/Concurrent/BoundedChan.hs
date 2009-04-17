@@ -16,10 +16,11 @@ module Control.Concurrent.BoundedChan(
        )
   where
 
-import Control.Concurrent.MVar
-import Control.Monad(replicateM)
-import Data.Array
-import System.IO.Unsafe(unsafeInterleaveIO)
+import Control.Concurrent.MVar (MVar, isEmptyMVar, newEmptyMVar, newMVar, 
+                                putMVar, takeMVar)
+import Control.Monad           (replicateM)
+import Data.Array              (Array, (!), listArray)
+import System.IO.Unsafe        (unsafeInterleaveIO)
 
 -- |'BoundedChan' is an abstract data type representing a bounded channel.
 data BoundedChan a = BC {
@@ -34,9 +35,9 @@ data BoundedChan a = BC {
 -- elements.
 newBoundedChan :: Int -> IO (BoundedChan a)
 newBoundedChan x = do
-  entls   <- replicateM x newEmptyMVar
-  wpos    <- newMVar 0
-  rpos    <- newMVar 0
+  entls <- replicateM x newEmptyMVar
+  wpos  <- newMVar 0
+  rpos  <- newMVar 0
   let entries = listArray (0, x - 1) entls
   return (BC x entries wpos rpos)
 
@@ -61,18 +62,18 @@ readChan (BC size contents _ rposMV) = do
 isEmptyChan :: BoundedChan a -> IO Bool
 isEmptyChan (BC _ contents _ rposMV) = do
   rpos <- takeMVar rposMV
-  res <- isEmptyMVar (contents ! rpos)
+  res  <- isEmptyMVar (contents ! rpos)
   putMVar rposMV rpos
   return res
 
 -- |Return a lazy list representing the contents of the supplied channel.
 getChanContents :: BoundedChan a -> IO [a]
 getChanContents ch = unsafeInterleaveIO $ do
-                       x  <- readChan ch
-                       xs <- getChanContents ch
-                       return (x:xs)
+  x  <- readChan ch
+  xs <- getChanContents ch
+  return (x:xs)
 
 -- |Write a list of elements to the channel. If the channel becomes full, this
 -- routine will block until it is able to write.
 writeList2Chan :: BoundedChan a -> [a] -> IO ()
-writeList2Chan ch ls = mapM_ (writeChan ch) ls
+writeList2Chan = mapM_ . writeChan
