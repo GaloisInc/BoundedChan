@@ -9,10 +9,10 @@ stability:     stable
 build-type:    Simple
 cabal-version: >= 1.6
 tested-with:   GHC == 6.10
-synopsis:      Implementation of bounded Chans.
-description:   This library introduces BoundedChan. BoundedChan works exactly
-               like Chan -- and, indeed, has the exact same interface -- but
-               is guaranteed to operate in a bounded amount of space.
+synopsis:      Implementation of bounded channels.
+description:   This library introduces BoundedChan. BoundedChans differ from
+               Chans in that they are guaranteed to contain no more than a
+               certain number of elements.
 
 library
   build-depends: base >= 3, array

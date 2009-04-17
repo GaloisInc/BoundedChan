@@ -1,12 +1,10 @@
--- |Implements bounded channels. In these channels, you can give a
--- rough maximum number of elements, and you will be guaranteed that no more
--- than that number of elements will be pending within the channel.
+-- |Implements bounded channels. These channels differ from normal 'Chan's in
+-- that they are guaranteed to contain no more than a certain number of
+-- elements. This is ideal when you may be writing to a channel faster than you
+-- are able to read from it.
 --
--- This boundedness is ideal when you will be (or may be) writing to a channel
--- faster than you are able to read from it.
---
--- This module supports all the functions of Control.Concurrent.Chan except
--- unGetChan and dupChan, which are not supported for bounded channels.
+-- This module supports all the functions of "Control.Concurrent.Chan" except
+-- 'unGetChan' and 'dupChan', which are not supported for bounded channels.
 module Control.Concurrent.BoundedChan(
          BoundedChan
        , newBoundedChan
@@ -23,7 +21,7 @@ import Control.Monad(replicateM)
 import Data.Array
 import System.IO.Unsafe(unsafeInterleaveIO)
 
--- |BoundedChan is an abstract data type representing an unbounded channel.
+-- |'BoundedChan' is an abstract data type representing a bounded channel.
 data BoundedChan a = BC {
        _size     :: Int
      , _contents :: Array Int (MVar a)
@@ -32,7 +30,8 @@ data BoundedChan a = BC {
      }
 -- LOCK ORDERING: A -> B -> C
 
--- |Create a new bounded chan with size n.
+-- |@newBoundedChan n@ returns a channel than can contain no more than @n@
+-- elements.
 newBoundedChan :: Int -> IO (BoundedChan a)
 newBoundedChan x = do
   entls   <- replicateM x newEmptyMVar
@@ -58,6 +57,7 @@ readChan (BC size contents _ rposMV) = do
   putMVar rposMV $! (rpos + 1) `mod` size
   takeMVar (contents ! rpos)
 
+-- |Returns 'True' if the supplied channel is empty.
 isEmptyChan :: BoundedChan a -> IO Bool
 isEmptyChan (BC _ contents _ rposMV) = do
   rpos <- takeMVar rposMV
@@ -65,13 +65,14 @@ isEmptyChan (BC _ contents _ rposMV) = do
   putMVar rposMV rpos
   return res
 
+-- |Return a lazy list representing the contents of the supplied channel.
 getChanContents :: BoundedChan a -> IO [a]
 getChanContents ch = unsafeInterleaveIO $ do
                        x  <- readChan ch
                        xs <- getChanContents ch
                        return (x:xs)
 
--- |Write a list of elements to the channel. Note that this may block as it
--- writes the list into the channel.
+-- |Write a list of elements to the channel. If the channel becomes full, this
+-- routine will block until it is able to write.
 writeList2Chan :: BoundedChan a -> [a] -> IO ()
 writeList2Chan ch ls = mapM_ (writeChan ch) ls
