@@ -17,7 +17,7 @@ description:   This library introduces BoundedChan. BoundedChans differ from
 library
   build-depends: base >= 3, array
   exposed-modules: Control.Concurrent.BoundedChan
-  ghc-options: -O2 -Wall -funbox-strict-fields -fno-cse
+  ghc-options: -O2 -Wall -funbox-strict-fields
   if impl(ghc >= 6.8)
     ghc-options: -fwarn-tabs
 

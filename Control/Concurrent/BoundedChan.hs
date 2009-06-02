@@ -72,7 +72,6 @@ getChanContents ch = unsafeInterleaveIO $ do
   x  <- readChan ch
   xs <- getChanContents ch
   return (x:xs)
-{-# NOINLINE getChanContents #-}
 
 -- |Write a list of elements to the channel. If the channel becomes full, this
 -- routine will block until it is able to write.
