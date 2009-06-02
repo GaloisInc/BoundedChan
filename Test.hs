@@ -1,5 +1,5 @@
 import Control.Concurrent hiding (readChan, writeChan)
-import Control.Concurrent.BoundedChan (BoundedChan, 
+import Control.Concurrent.BoundedChan (BoundedChan,
                                        newBoundedChan, readChan, writeChan)
 
 main :: IO ()

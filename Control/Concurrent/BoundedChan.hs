@@ -16,7 +16,7 @@ module Control.Concurrent.BoundedChan(
        )
   where
 
-import Control.Concurrent.MVar (MVar, isEmptyMVar, newEmptyMVar, newMVar, 
+import Control.Concurrent.MVar (MVar, isEmptyMVar, newEmptyMVar, newMVar,
                                 putMVar, takeMVar)
 import Control.Monad           (replicateM)
 import Data.Array              (Array, (!), listArray)
