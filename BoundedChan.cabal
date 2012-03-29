@@ -15,7 +15,8 @@ description:   This library introduces BoundedChan. BoundedChans differ from
                certain number of elements.
 
 library
-  build-depends: base >= 3, array
+  build-depends: base >= 3 && < 5, 
+                 array >= 0.2 && < 0.8
   exposed-modules: Control.Concurrent.BoundedChan
   ghc-options: -O2 -Wall -funbox-strict-fields
   if impl(ghc >= 6.8)
