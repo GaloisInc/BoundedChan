@@ -1,6 +1,6 @@
 name:          BoundedChan
 category:      Concurrency
-version:       1.0.0.2
+version:       1.0.0.3
 license:       BSD3
 license-file:  LICENSE
 author:        Adam Wick <awick@galois.com>
@@ -23,4 +23,4 @@ library
 
 source-repository head
   type:     git
-  location: git://code.haskell.org/BoundedChan.git
+  location: git://github.com/GaloisInc/BoundedChan.git
