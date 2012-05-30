@@ -1,9 +1,9 @@
 name:          BoundedChan
 category:      Concurrency
-version:       1.0.0.3
+version:       1.0.1.0
 license:       BSD3
 license-file:  LICENSE
-author:        Adam Wick <awick@galois.com>
+author:        Adam Wick <awick@galois.com>, Chris Kuklewicz <haskell@list.mightyreason.com>
 maintainer:    Adam Wick <awick@galois.com>
 stability:     stable
 build-type:    Simple
