@@ -6,17 +6,17 @@
 -- This module supports all the functions of "Control.Concurrent.Chan" except
 -- 'unGetChan' and 'dupChan', which are not supported for bounded channels.
 --
--- This forked version is exception safe: killThread cannot break the channel.
+-- Extra consitency: This version enforces that if thread Alice writes
+-- e1 followed by e2 then e1 will be returned by readChan before e2.
+-- Conversely, if thead Bob reads e1 followed by e2 then it was true that
+-- writeChan e1 preceded writeChan e2.
 --
--- Extra consitency: This forked version enforces that if thread Alice writes e1 followed by e2 then
--- e1 will be returned by readChan before e2. Conversely, if thead Bob reads e1 followed by e2 then
--- it was true that writeChan e1 preceded writeChan e2.
---
--- The old version did not enforce this consistency: if writeChan were preempted between putMVars or
--- killThread arrived between putMVars then it can fail.  Similarly it might fail if readChan were
--- stopped after putMVar and before the second takeMVar.  An unlucky pattern of several such deaths
--- might actually break the invariants of the array in an unrecoverable way causing all future reads
--- and writes to block.
+-- Previous versions did not enforce this consistency: if writeChan were
+-- preempted between putMVars or killThread arrived between putMVars then it
+-- can fail.  Similarly it might fail if readChan were stopped after putMVar
+-- and before the second takeMVar.  An unlucky pattern of several such deaths
+-- might actually break the invariants of the array in an unrecoverable way
+-- causing all future reads and writes to block.
 module Control.Concurrent.BoundedChan(
          BoundedChan
        , newBoundedChan

@@ -1,9 +1,0 @@
-This is a fork of http://github.com/GaloisInc/BoundedChan
-
-The original repository is by Adam Wick (at Galois) forked at version 1.0.0.3 ( http://hackage.haskell.org/package/BoundedChan-1.0.0.3 ).
-
-This fork is by me, Chris Kuklewicz (hobbyist), in May 2012.
-
-I noticed that that the try* & put* could be more exception safe, the old version could be broken with unlucky killThread calls.
-
-
