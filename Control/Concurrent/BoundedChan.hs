@@ -21,7 +21,9 @@ module Control.Concurrent.BoundedChan(
          BoundedChan
        , newBoundedChan
        , writeChan
+       , tryWriteChan
        , readChan
+       , tryReadChan
        , isEmptyChan
        , getChanContents
        , writeList2Chan
@@ -29,7 +31,7 @@ module Control.Concurrent.BoundedChan(
   where
 
 import Control.Concurrent.MVar (MVar, isEmptyMVar, newEmptyMVar, newMVar,
-                                putMVar, takeMVar)
+                                putMVar, tryPutMVar, takeMVar, tryTakeMVar)
 import Control.Exception       (mask_, onException)
 import Control.Monad           (replicateM)
 import Data.Array              (Array, (!), listArray)
@@ -90,6 +92,17 @@ writeChan (BC size contents wposMV _) x = modifyMVar_mask_ wposMV $
     putMVar (contents ! wpos) x
     return ((succ wpos) `mod` size) -- only advance when putMVar succeeds
 
+-- |A variant of 'writeChan' which, instead of blocking when the channel is
+-- full, simply aborts and does not write the element. Note that this routine
+-- can still block while waiting for write access to the channel.
+tryWriteChan :: BoundedChan a -> a -> IO Bool
+tryWriteChan (BC size contents wposMV _) x = modifyMVar_mask wposMV $
+  \wpos -> do
+    success <- tryPutMVar (contents ! wpos) x
+    return $ if success
+      then ((succ wpos) `mod` size, True) -- only advance when putMVar succeeds
+      else (wpos, False)
+
 -- |Read an element from the channel. If the channel is empty, this routine
 -- will block until it is able to read.  Blockers wait in a fair FIFO queue.
 readChan :: BoundedChan a -> IO a
@@ -97,6 +110,18 @@ readChan (BC size contents _ rposMV) = modifyMVar_mask rposMV $
   \rpos -> do
     a <- takeMVar (contents ! rpos)
     return ((succ rpos) `mod` size, a) -- only advance when takeMVar succeeds
+
+-- |A variant of 'readChan' which, instead of blocking when the channel is
+-- empty, immediately returns 'Nothing'. Otherwise, 'tryReadChan' returns
+-- @'Just' a@ where @a@ is the element read from the channel. Note that this
+-- routine can still block while waiting for read access to the channel.
+tryReadChan :: BoundedChan a -> IO (Maybe a)
+tryReadChan (BC size contents _ rposMV) = modifyMVar_mask rposMV $
+  \rpos -> do
+    ma <- tryTakeMVar (contents ! rpos)
+    return $ case ma of
+      Just a -> ((succ rpos) `mod` size, Just a) -- only advance when takeMVar succeeds
+      Nothing -> (rpos, Nothing)
 
 -- |DANGER: This may block on an empty channel if there is already a blocked reader.
 -- Returns 'True' if the supplied channel is empty.
